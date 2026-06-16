@@ -1,0 +1,5 @@
+---
+- name: Deploy apache role on webservers group
+  hosts: webservers
+  roles:
+    - apache

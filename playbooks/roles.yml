@@ -1,0 +1,14 @@
+---
+# NOTE: Run with ansible-navigator (collection-installed roles)
+# Ensure roles are installed first:
+#   ansible-galaxy install -r roles/requirements.yml
+
+- name: Deploy phpinfo role on webservers
+  hosts: webservers
+  roles:
+    - phpinfo
+
+- name: Deploy balancer role on balancers
+  hosts: balancers
+  roles:
+    - balancer

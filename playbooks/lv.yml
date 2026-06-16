@@ -1,0 +1,39 @@
+---
+- name: Create logical volume on all managed nodes
+  hosts: all
+  tasks:
+    - name: Create LV in research VG (1500 MiB, fallback 800 MiB)
+      block:
+        - name: Create logical volume data at 1500 MiB
+          community.general.lvol:
+            vg: research
+            lv: data
+            size: 1500
+
+        - name: Format logical volume with ext4
+          community.general.filesystem:
+            fstype: ext4
+            dev: /dev/research/data
+
+      rescue:
+        - name: Notify size failure
+          ansible.builtin.debug:
+            msg: "Could not create logical volume of that size"
+
+        - name: Create logical volume data at 800 MiB (fallback)
+          community.general.lvol:
+            vg: research
+            lv: data
+            size: 800
+
+        - name: Format fallback logical volume with ext4
+          community.general.filesystem:
+            fstype: ext4
+            dev: /dev/research/data
+
+      when: ansible_lvm.vgs.research is defined
+
+    - name: Notify missing volume group
+      ansible.builtin.debug:
+        msg: "Volume group does not exist"
+      when: ansible_lvm.vgs.research is not defined

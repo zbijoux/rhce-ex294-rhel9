@@ -1,0 +1,29 @@
+---
+- name: Install Apache httpd package
+  ansible.builtin.yum:
+    name: httpd
+    state: latest
+
+- name: Start and enable httpd service
+  ansible.builtin.systemd:
+    name: httpd
+    state: started
+    enabled: yes
+
+- name: Start and enable firewalld service
+  ansible.builtin.systemd:
+    name: firewalld
+    state: started
+    enabled: yes
+
+- name: Allow HTTP through firewall (permanent + immediate)
+  ansible.posix.firewalld:
+    service: http
+    permanent: yes
+    state: enabled
+    immediate: yes
+
+- name: Deploy index.html from Jinja2 template
+  ansible.builtin.template:
+    src: index.html.j2
+    dest: /var/www/html/index.html

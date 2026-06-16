@@ -1,0 +1,21 @@
+---
+- name: Set /etc/issue content based on host group
+  hosts: all
+  tasks:
+    - name: Set /etc/issue to Development on dev hosts
+      ansible.builtin.copy:
+        content: "Development"
+        dest: /etc/issue
+      when: inventory_hostname in groups.dev
+
+    - name: Set /etc/issue to Test on test hosts
+      ansible.builtin.copy:
+        content: "Test"
+        dest: /etc/issue
+      when: inventory_hostname in groups.test
+
+    - name: Set /etc/issue to Production on prod hosts
+      ansible.builtin.copy:
+        content: "Production"
+        dest: /etc/issue
+      when: inventory_hostname in groups.prod

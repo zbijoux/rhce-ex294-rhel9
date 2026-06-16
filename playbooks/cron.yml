@@ -1,0 +1,10 @@
+---
+- name: Configure cron job for natasha on dev hosts
+  hosts: dev
+  tasks:
+    - name: Create cron job that logs EX294 progress every 2 minutes
+      ansible.builtin.cron:
+        name: "EX294 progress logger"
+        minute: "*/2"
+        job: 'logger "EX294 in progress"'
+        user: natasha

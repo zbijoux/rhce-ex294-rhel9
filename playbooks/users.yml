@@ -1,0 +1,40 @@
+---
+- name: Create developer users on dev and test hosts
+  hosts: dev,test
+  vars_files:
+    - /home/student/ansible/locker.yml
+    - /home/student/ansible/user_list.yml
+  tasks:
+    - name: Ensure devops group exists
+      ansible.builtin.group:
+        name: devops
+        state: present
+
+    - name: Create developer user accounts
+      ansible.builtin.user:
+        name: "{{ item.name }}"
+        groups: devops
+        password: "{{ pw_developer | password_hash('sha512') }}"
+        password_expire_max: "{{ item.password_expire_max }}"
+      loop: "{{ users }}"
+      when: item.job == 'developer'
+
+- name: Create manager users on prod hosts
+  hosts: prod
+  vars_files:
+    - /home/student/ansible/locker.yml
+    - /home/student/ansible/user_list.yml
+  tasks:
+    - name: Ensure opsmgr group exists
+      ansible.builtin.group:
+        name: opsmgr
+        state: present
+
+    - name: Create manager user accounts
+      ansible.builtin.user:
+        name: "{{ item.name }}"
+        groups: opsmgr
+        password: "{{ pw_manager | password_hash('sha512') }}"
+        password_expire_max: "{{ item.password_expire_max }}"
+      loop: "{{ users }}"
+      when: item.job == 'manager'

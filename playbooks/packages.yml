@@ -1,0 +1,23 @@
+---
+- name: Install php and mariadb on dev, test and prod
+  hosts: dev,test,prod
+  tasks:
+    - name: Install required packages
+      ansible.builtin.yum:
+        name:
+          - php
+          - mariadb
+        state: present
+
+- name: Install RPM Development Tools and upgrade all packages on dev
+  hosts: dev
+  tasks:
+    - name: Install RPM Development Tools group
+      ansible.builtin.yum:
+        name: "@RPM Development Tools"
+        state: present
+
+    - name: Upgrade all packages to latest version
+      ansible.builtin.yum:
+        name: "*"
+        state: latest

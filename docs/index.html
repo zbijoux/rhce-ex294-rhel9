@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RHCE EX294 Study Guide</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,sans-serif;background:#0f1117;color:#e2e8f0;height:100vh;display:flex;flex-direction:column}
+.shell{display:flex;flex:1;overflow:hidden}
+.sidebar{width:230px;min-width:230px;background:#161b27;border-right:1px solid #2d3748;display:flex;flex-direction:column}
+.sb-head{padding:14px;border-bottom:1px solid #2d3748}
+.sb-head h2{font-size:14px;font-weight:600;color:#e2e8f0;margin-bottom:3px}
+.sb-head p{font-size:11px;color:#718096}
+.sb-filters{display:flex;gap:5px;padding:9px 10px;border-bottom:1px solid #2d3748;flex-wrap:wrap}
+.fb{font-size:10px;padding:3px 9px;border-radius:99px;border:1px solid #4a5568;background:transparent;cursor:pointer;color:#a0aec0;font-family:inherit;font-weight:500;transition:all .15s}
+.fb:hover{border-color:#7c6fe0;color:#c4b5fd}
+.fb.a-all{background:#6c63ff;color:#fff;border-color:#6c63ff}
+.fb.a-easy{background:#2f855a;color:#fff;border-color:#2f855a}
+.fb.a-med{background:#c05621;color:#fff;border-color:#c05621}
+.fb.a-hard{background:#c53030;color:#fff;border-color:#c53030}
+.sb-list{flex:1;overflow-y:auto;padding:6px 0}
+.sb-list::-webkit-scrollbar{width:4px}
+.sb-list::-webkit-scrollbar-track{background:transparent}
+.sb-list::-webkit-scrollbar-thumb{background:#4a5568;border-radius:99px}
+.si{display:flex;align-items:center;gap:6px;padding:7px 12px;cursor:pointer;border-left:3px solid transparent;transition:background .1s}
+.si:hover{background:rgba(108,99,255,.1)}
+.si.active{background:rgba(108,99,255,.15);border-left-color:#6c63ff}
+.si.hidden{display:none}
+.si-num{font-size:10px;font-weight:600;color:#718096;min-width:20px}
+.si.active .si-num{color:#6c63ff}
+.si-title{font-size:11.5px;color:#a0aec0;flex:1;line-height:1.3}
+.si.active .si-title{color:#e2e8f0;font-weight:500}
+.bdg{font-size:9px;padding:2px 6px;border-radius:99px;font-weight:700;white-space:nowrap;flex-shrink:0}
+.bdg.easy{background:#1c4532;color:#68d391}
+.bdg.med{background:#7b341e;color:#fbd38d}
+.bdg.hard{background:#742a2a;color:#fc8181}
+.main{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
+.topbar{display:flex;align-items:center;gap:10px;padding:10px 18px;border-bottom:1px solid #2d3748;background:#161b27;flex-shrink:0}
+.crumb{font-size:12px;color:#718096;flex:1}
+.crumb b{color:#e2e8f0;font-weight:500}
+.dp{font-size:10px;padding:3px 10px;border-radius:99px;font-weight:700}
+.dp.easy{background:#1c4532;color:#68d391}
+.dp.med{background:#7b341e;color:#fbd38d}
+.dp.hard{background:#742a2a;color:#fc8181}
+.content{flex:1;overflow-y:auto;padding:20px 24px}
+.content::-webkit-scrollbar{width:4px}
+.content::-webkit-scrollbar-thumb{background:#4a5568;border-radius:99px}
+.q-heading{font-size:16px;font-weight:600;margin-bottom:8px;color:#e2e8f0;line-height:1.35}
+.q-files{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:16px}
+.fp{font-size:10px;padding:2px 9px;border-radius:99px;background:#2d2060;color:#b794f4;border:1px solid #553c9a}
+.tabs{display:flex;border-bottom:1px solid #2d3748;margin-bottom:18px;overflow-x:auto}
+.tabs::-webkit-scrollbar{height:2px}
+.tab{font-size:12px;padding:8px 14px;cursor:pointer;color:#718096;border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap;transition:color .15s}
+.tab:hover{color:#a0aec0}
+.tab.on{color:#6c63ff;border-bottom-color:#6c63ff;font-weight:500}
+.panel{display:none}
+.panel.on{display:block}
+.attempt{font-size:12px;color:#718096;padding:8px 12px;background:#1a202c;border-radius:8px;border:1px dashed #4a5568;margin-bottom:14px;display:flex;align-items:center;gap:7px}
+.qbox{background:#1a202c;border-left:3px solid #6c63ff;border-radius:0 8px 8px 0;padding:14px 16px;font-size:13px;line-height:1.85;color:#e2e8f0}
+.qbox ul{margin:8px 0 0 20px}.qbox li{margin-bottom:4px;color:#cbd5e0}
+.qbox code{font-family:'Courier New',monospace;font-size:11px;background:#2d3748;padding:2px 6px;border-radius:4px;color:#90cdf4}
+.prose{font-size:13px;color:#a0aec0;line-height:1.85}
+.prose code{font-family:'Courier New',monospace;font-size:11px;background:#2d3748;padding:2px 6px;border-radius:4px;color:#90cdf4}
+.prose b{color:#e2e8f0}
+.slabel{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#718096;margin:16px 0 8px;display:flex;align-items:center;gap:6px}
+.opt-tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.ob{font-size:11px;padding:4px 12px;border-radius:99px;border:1px solid #4a5568;background:transparent;cursor:pointer;color:#a0aec0;font-family:inherit;transition:all .15s}
+.ob:hover{border-color:#6c63ff;color:#c4b5fd}
+.ob.on{background:#6c63ff;color:#fff;border-color:#6c63ff}
+.op{display:none}.op.on{display:block}
+.code{background:#1a202c;border:1px solid #2d3748;border-radius:8px;padding:13px 15px;font-family:'Courier New',monospace;font-size:11px;line-height:1.85;overflow-x:auto;white-space:pre;color:#e2e8f0;margin-bottom:12px}
+.run-box{background:#1a2e1a;border:1px solid #2f6b2f;border-radius:8px;padding:13px 15px;margin-bottom:12px}
+.run-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#68d391;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.run-box .code{background:#0f1f0f;border-color:#2f6b2f;margin-bottom:0}
+.vlist{list-style:none;display:flex;flex-direction:column;gap:6px}
+.vlist li{font-size:12px;padding:8px 12px;background:#1a2e1a;border-left:3px solid #2f855a;border-radius:0 8px 8px 0;line-height:1.6;color:#a0aec0}
+.vlist li code{font-family:'Courier New',monospace;font-size:10.5px;background:#2d3748;padding:2px 5px;border-radius:3px;color:#90cdf4}
+.tlist{list-style:none;display:flex;flex-direction:column;gap:7px}
+.tlist li{font-size:12px;padding:8px 12px;background:#2d1515;border-left:3px solid #c53030;border-radius:0 8px 8px 0;line-height:1.6;color:#a0aec0}
+.tlist li code{font-family:'Courier New',monospace;font-size:10.5px;background:#2d3748;padding:2px 5px;border-radius:3px;color:#90cdf4}
+.footer{display:flex;align-items:center;gap:12px;padding:11px 18px;border-top:1px solid #2d3748;background:#161b27;flex-shrink:0}
+.nbtn{font-size:13px;padding:7px 20px;border:1px solid #4a5568;border-radius:8px;background:#1a202c;color:#e2e8f0;cursor:pointer;font-family:inherit;font-weight:500;transition:all .15s;flex-shrink:0}
+.nbtn:hover:not(:disabled){background:#2d3748;border-color:#718096}
+.nbtn:disabled{opacity:.3;cursor:not-allowed}
+.nbtn.pri{background:#6c63ff;color:#fff;border-color:#6c63ff}
+.nbtn.pri:hover:not(:disabled){background:#5a52d5}
+.prog{flex:1;display:flex;align-items:center;gap:10px}
+.pbar{flex:1;height:5px;background:#2d3748;border-radius:99px;overflow:hidden}
+.pfill{height:100%;background:#6c63ff;border-radius:99px;transition:width .3s}
+.plbl{font-size:12px;color:#718096;white-space:nowrap;min-width:48px;text-align:center;font-weight:500}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="sidebar">
+    <div class="sb-head">
+      <h2>EX294 Study Guide</h2>
+      <p>17 questions · user: student</p>
+    </div>
+    <div class="sb-filters">
+      <button class="fb a-all" onclick="setFilter('all',this)">All</button>
+      <button class="fb" onclick="setFilter('easy',this)">Easy</button>
+      <button class="fb" onclick="setFilter('med',this)">Med</button>
+      <button class="fb" onclick="setFilter('hard',this)">Hard</button>
+    </div>
+    <div class="sb-list" id="sbList"></div>
+  </div>
+  <div class="main">
+    <div class="topbar">
+      <span class="crumb">docs / <b id="topFile">q01.md</b></span>
+      <span class="dp easy" id="topDiff">easy</span>
+    </div>
+    <div class="content" id="content"></div>
+    <div class="footer">
+      <button class="nbtn" id="prevBtn" onclick="nav(-1)">← Prev</button>
+      <div class="prog">
+        <div class="pbar"><div class="pfill" id="pfill" style="width:5.9%"></div></div>
+        <span class="plbl" id="plbl">1 / 17</span>
+      </div>
+      <button class="nbtn pri" id="nextBtn" onclick="nav(1)">Next →</button>
+    </div>
+  </div>
+</div>
+<script>
+const Q=[
+{n:"01",t:"Install and configure Ansible",d:"easy",f:["ansible.cfg","inventory/hosts"],
+q:`Install and configure Ansible on control node <b>control.lab.example.com</b>:<ul><li>Install required packages</li><li>Create static inventory <code>/home/student/ansible/inventory</code>: node1→dev, node2→test, node3+node4→prod, node5→balancers, prod is child of webservers</li><li>Create <code>/home/student/ansible/ansible.cfg</code>: inventory path, default roles dir, default collections dir</li></ul>`,
+a:"Install ansible-automation-platform-common and ansible-navigator. Create working dirs. Generate ansible.cfg via <code>ansible-config init --disabled</code> then trim to required keys. Build static inventory with correct groups and the <code>[webservers:children]</code> parent.",
+s:[{l:"ansible.cfg",c:`[defaults]
+inventory         = /home/student/ansible/inventory
+remote_user       = student
+host_key_checking = False
+roles_path        = /home/student/ansible/roles:/usr/share/ansible/roles
+collections_path  = ./collections/:.ansible/collections:/usr/share/ansible/collections
+vault_password_file = /home/student/ansible/secret.txt
+
+[privilege_escalation]
+become       = True
+become_method= sudo
+become_user  = root`},{l:"inventory/hosts",c:`[dev]
+node1
+[test]
+node2
+[prod]
+node3
+node4
+[balancers]
+node5
+[webservers:children]
+prod`}],
+r:`# No playbook — pure configuration
+ansible --version
+ansible-inventory --graph
+ansible all -m ping`,
+v:["ansible --version | grep 'config file'  # must point to your ansible.cfg","ansible-inventory --graph  # webservers must appear as parent of prod","ansible all -m ping  # SUCCESS pong from all 5 nodes"],
+tr:["roles_path must include BOTH paths — missing /usr/share/ansible/roles breaks rhel-system-roles","[webservers:children] not [webservers] — the :children suffix is mandatory","remote_user = student — PDF uses greg; this lab uses student","vault_password_file set here so Q14/Q15 work automatically"]},
+{n:"02",t:"Create yum repositories",d:"easy",f:["playbooks/yum_repo.yml"],
+q:`Create <code>playbooks/yum_repo.yml</code> that creates two yum repos on <b>all</b> managed nodes:<ul><li><b>EX294_BASE</b> — BaseOS, GPG enabled, enabled</li><li><b>EX294_STREAM</b> — AppStream, GPG enabled, enabled</li></ul>Base root: <code>http://content/rhel9.0/x86_64/dvd/</code> · GPG key: <code>RPM-GPG-KEY-redhat-release</code>`,
+a:"Use <code>ansible.builtin.yum_repository</code>. Both repos share the same GPG key URL. The <code>file:</code> key controls the .repo filename in /etc/yum.repos.d/.",
+s:[{l:"yum_repo.yml",c:`---
+- name: Configure YUM repositories on all managed nodes
+  hosts: all
+  tasks:
+    - ansible.builtin.yum_repository:
+        file: EX294_BASE
+        name: EX294_BASE
+        description: EX294 base software
+        baseurl: http://content/rhel9.0/x86_64/dvd/BaseOS
+        gpgcheck: yes
+        gpgkey: http://content/rhel9.0/x86_64/dvd/RPM-GPG-KEY-redhat-release
+        enabled: yes
+    - ansible.builtin.yum_repository:
+        file: EX294_STREAM
+        name: EX294_STREAM
+        description: EX294 stream software
+        baseurl: http://content/rhel9.0/x86_64/dvd/AppStream
+        gpgcheck: yes
+        gpgkey: http://content/rhel9.0/x86_64/dvd/RPM-GPG-KEY-redhat-release
+        enabled: yes`}],
+r:`cd /home/student/ansible
+ansible-navigator run playbooks/yum_repo.yml -m stdout`,
+v:["ansible all -a 'yum repoinfo'  # both repos on every node","ansible all -a 'yum -y install ftp && rpm -q ftp'"],
+tr:["GPG key URL in PDF has a line-wrap typo","gpgcheck: yes not gpgcheck: 1","hosts: all — repos must be on ALL nodes"]},
+{n:"03",t:"Install packages",d:"easy",f:["playbooks/packages.yml"],
+q:`Create <code>playbooks/packages.yml</code>:<ul><li>Install <b>php</b> and <b>mariadb</b> on <b>dev, test, prod</b></li><li>Install <b>RPM Development Tools</b> group on <b>dev</b> only</li><li>Update <b>all packages</b> to latest on <b>dev</b> only</li></ul>`,
+a:"Two separate plays. Play 1 targets dev,test,prod. Play 2 targets dev only for the group install and full upgrade. Use <code>name: \"*\"</code> with <code>state: latest</code>.",
+s:[{l:"packages.yml",c:`---
+- name: Install php and mariadb on dev, test, prod
+  hosts: dev,test,prod
+  tasks:
+    - ansible.builtin.yum:
+        name: [php, mariadb]
+        state: present
+
+- name: Dev only — RPM Dev Tools and full upgrade
+  hosts: dev
+  tasks:
+    - ansible.builtin.yum:
+        name: "@RPM Development Tools"
+        state: present
+    - ansible.builtin.yum:
+        name: "*"
+        state: latest`}],
+r:`cd /home/student/ansible
+ansible-navigator run playbooks/packages.yml -m stdout`,
+v:["ansible dev,test,prod -a 'rpm -q php mariadb'","ansible dev -a 'yum grouplist installed'"],
+tr:["\"@RPM Development Tools\" — @ prefix is mandatory","Two separate plays — host targets differ","name: \"*\" with state: latest not state: present"]},
+{n:"04",t:"Use the SELinux role",d:"med",f:["playbooks/selinux.yml"],
+q:`Create <code>playbooks/selinux.yml</code> that:<ul><li>Runs on <b>all</b> managed nodes</li><li>Uses the <b>rhel-system-roles.selinux</b> role</li><li>Configures SELinux policy as <b>targeted</b>, state as <b>enforcing</b></li></ul>`,
+a:"<b>Two options</b> — ansible-navigator runs inside an EE container and cannot see RPM roles in /usr/share/ansible/roles on the host.<br><br><b>Option 1 — Copy RPM role</b>: Install RPM, copy the selinux role into your working roles/ dir, use role name <code>rhel-system-roles.selinux</code>.<br><br><b>Option 2 — Collection FQCN</b>: Use the redhat.rhel_system_roles collection from Q05 with full name <code>redhat.rhel_system_roles.selinux</code>. Both run with <code>ansible-navigator run -m stdout</code>.",
+s:[{l:"Option 1 — Copy RPM role",c:`# Install and copy the role
+sudo dnf -y install rhel-system-roles
+cp -r /usr/share/ansible/roles/rhel-system-roles.selinux \\
+      /home/student/ansible/roles/
+
+---
+- hosts: all
+  become: true
+  vars:
+    selinux_policy: targeted
+    selinux_state: enforcing
+  tasks:
+    - block:
+        - ansible.builtin.include_role:
+            name: rhel-system-roles.selinux
+      rescue:
+        - ansible.builtin.fail:
+            msg: "role failed"
+          when: not selinux_reboot_required
+        - ansible.builtin.reboot:
+        - ansible.builtin.wait_for_connection:
+            delay: 10
+            timeout: 300
+        - ansible.builtin.include_role:
+            name: rhel-system-roles.selinux`},
+{l:"Option 2 — Collection FQCN",c:`# Collection installed in Q05 — no copy needed
+
+---
+- hosts: all
+  become: true
+  vars:
+    selinux_policy: targeted
+    selinux_state: enforcing
+  tasks:
+    - block:
+        - ansible.builtin.include_role:
+            name: redhat.rhel_system_roles.selinux
+      rescue:
+        - ansible.builtin.fail:
+            msg: "role failed"
+          when: not selinux_reboot_required
+        - ansible.builtin.reboot:
+        - ansible.builtin.wait_for_connection:
+            delay: 10
+            timeout: 300
+        - ansible.builtin.include_role:
+            name: redhat.rhel_system_roles.selinux`}],
+r:`cd /home/student/ansible
+# Option 1 only — copy role first:
+sudo dnf -y install rhel-system-roles
+cp -r /usr/share/ansible/roles/rhel-system-roles.selinux roles/
+
+# Both options:
+ansible-navigator run playbooks/selinux.yml -m stdout`,
+v:["ansible all -m shell -a 'grep ^SELINUX= /etc/selinux/config'  # SELINUX=enforcing","ansible all -m shell -a 'getenforce'  # Enforcing on all 5 nodes"],
+tr:["Option 1: copy the role — EE container cannot see /usr/share/ansible/roles on the host","Option 2: full FQCN redhat.rhel_system_roles.selinux — short name selinux resolves to nothing","rescue must check selinux_reboot_required before rebooting","selinux_policy: targeted must be specified explicitly"]},
+{n:"05",t:"Install a collection",d:"med",f:["collections/requirements.yml"],
+q:`Install collection artifacts from <code>http://classroom/materials/</code> into <code>/home/student/ansible/collections</code>:<ul><li>redhat-insights-1.0.7.tar.gz</li><li>community-general-5.5.0.tar.gz</li><li>redhat-rhel_system_roles-1.19.3.tar.gz</li></ul>`,
+a:"Create <code>collections/requirements.yml</code> with a <code>collections:</code> key. Run <code>ansible-galaxy collection install -r</code> with the <code>-p</code> flag. Installing redhat-rhel_system_roles here enables Q04 Option 2.",
+s:[{l:"collections/requirements.yml",c:`---
+collections:
+  - name: http://classroom/materials/redhat-insights-1.0.7.tar.gz
+  - name: http://classroom/materials/community-general-5.5.0.tar.gz
+  - name: http://classroom/materials/redhat-rhel_system_roles-1.19.3.tar.gz`}],
+r:`cd /home/student/ansible
+ansible-galaxy collection install \\
+  -r collections/requirements.yml \\
+  -p /home/student/ansible/collections`,
+v:["ansible-navigator collections  # all three listed","ls collections/ansible_collections/  # community/ and redhat/ present"],
+tr:["Use -p not --collections-path","collections: key at root level — not nested under roles:","This enables Q04 Option 2"]},
+{n:"06",t:"Install roles using Ansible Galaxy",d:"easy",f:["roles/requirements.yml"],
+q:`Use <code>roles/requirements.yml</code> to install roles to <code>/home/student/ansible/roles</code>:<ul><li><code>http://classroom/materials/haproxy.tar</code> → name: <b>balancer</b></li><li><code>http://classroom/materials/phpinfo.tar</code> → name: <b>phpinfo</b></li></ul>`,
+a:"Root-level YAML list (not a <code>roles:</code> key). Each entry has <code>src:</code> and <code>name:</code>. Run <code>ansible-galaxy install -r</code>.",
+s:[{l:"roles/requirements.yml",c:`---
+- src: http://classroom/materials/haproxy.tar
+  name: balancer
+
+- src: http://classroom/materials/phpinfo.tar
+  name: phpinfo`}],
+r:`cd /home/student/ansible
+ansible-galaxy install -r roles/requirements.yml
+ansible-galaxy list`,
+v:["ansible-galaxy list  # balancer and phpinfo both listed","ls roles/  # apache/ balancer/ phpinfo/ all present"],
+tr:["name: balancer renames the role — without it installs as haproxy","Root-level list not a roles: key","ansible-galaxy install not ansible-galaxy collection install"]},
+{n:"07",t:"Create and use the apache role",d:"hard",f:["roles/apache/","playbooks/apache.yml"],
+q:`Create role <b>apache</b> in <code>roles/</code>:<ul><li>httpd installed, enabled, started</li><li>firewalld enabled and running, HTTP allowed</li><li>Template <code>index.html.j2</code> → <code>/var/www/html/index.html</code>: <code>Welcome to FQDN on IPADDRESS</code></li></ul>Create <code>playbooks/apache.yml</code> targeting <b>webservers</b> group.`,
+a:"Run <code>ansible-galaxy role init</code> for the skeleton. tasks/main.yml order: install httpd → start+enable httpd → start+enable firewalld → open HTTP in firewall → deploy template. Template uses <code>ansible_fqdn</code> and <code>ansible_default_ipv4.address</code>.",
+s:[{l:"roles/apache/tasks/main.yml",c:`---
+- ansible.builtin.yum:
+    name: httpd
+    state: latest
+- ansible.builtin.systemd:
+    name: httpd
+    state: started
+    enabled: yes
+- ansible.builtin.systemd:
+    name: firewalld
+    state: started
+    enabled: yes
+- ansible.posix.firewalld:
+    service: http
+    permanent: yes
+    state: enabled
+    immediate: yes
+- ansible.builtin.template:
+    src: index.html.j2
+    dest: /var/www/html/index.html`},
+{l:"templates/index.html.j2",c:`Welcome to {{ ansible_fqdn }} on {{ ansible_default_ipv4.address }}`},
+{l:"playbooks/apache.yml",c:`---
+- hosts: webservers
+  roles:
+    - apache`}],
+r:`cd /home/student/ansible
+ansible-galaxy role init --init-path roles apache
+# populate tasks and template, then:
+ansible-navigator run playbooks/apache.yml -m stdout`,
+v:["ansible webservers -a 'systemctl status httpd'","curl http://node3  # Welcome to node3.lab.example.com on 172.25.250.11","curl http://node4  # Welcome to node4.lab.example.com on 172.25.250.12"],
+tr:["ansible_fqdn and ansible_default_ipv4.address in template — not inventory_hostname","firewalld must be started before the firewalld module task","hosts: webservers not hosts: prod","immediate: yes — without it rule only applies after next restart"]},
+{n:"08",t:"Use roles from Ansible Galaxy",d:"med",f:["playbooks/roles.yml"],
+q:`Create <code>playbooks/roles.yml</code>:<ul><li>Play on <b>webservers</b> using <b>phpinfo</b> role — <code>/hello.php</code> shows Hello PHP World from FQDN</li><li>Play on <b>balancers</b> using <b>balancer</b> role — curl alternates between node3 and node4</li></ul>`,
+a:"<b>phpinfo play must come first</b> — backends must be ready before configuring the load balancer. Both roles installed in Q06.",
+s:[{l:"roles.yml",c:`---
+- name: Deploy phpinfo role on webservers
+  hosts: webservers
+  roles:
+    - phpinfo
+
+- name: Deploy balancer role on balancers
+  hosts: balancers
+  roles:
+    - balancer`}],
+r:`cd /home/student/ansible
+ansible-galaxy install -r roles/requirements.yml
+ansible-navigator run playbooks/roles.yml -m stdout`,
+v:["curl http://172.25.250.13  # 1st: node3","curl http://172.25.250.13  # 2nd: node4 (round-robin)","curl http://node3/hello.php  # Hello PHP World from node3.lab.example.com"],
+tr:["phpinfo play BEFORE balancer — order matters","Curl balancer multiple times to confirm round-robin","Roles from Q06 must be installed first"]},
+{n:"09",t:"Create and use a logical volume",d:"hard",f:["playbooks/lv.yml"],
+q:`Create <code>playbooks/lv.yml</code> on all nodes:<ul><li>LV <b>data</b> in VG <b>research</b>, size <b>1500 MiB</b>, format <b>ext4</b></li><li>If size fails → print <code>Could not create logical volume of that size</code> → use <b>800 MiB</b></li><li>If VG research missing → print <code>Volume group does not exist</code></li><li><b>Do NOT mount</b> the logical volume</li></ul>`,
+a:"Use <code>block/rescue</code> for size fallback. The <code>when: ansible_lvm.vgs.research is defined</code> must go on the <b>block</b>, not on individual tasks.",
+s:[{l:"lv.yml",c:`---
+- hosts: all
+  tasks:
+    - block:
+        - community.general.lvol:
+            vg: research
+            lv: data
+            size: 1500
+        - community.general.filesystem:
+            fstype: ext4
+            dev: /dev/research/data
+      rescue:
+        - ansible.builtin.debug:
+            msg: "Could not create logical volume of that size"
+        - community.general.lvol:
+            vg: research
+            lv: data
+            size: 800
+        - community.general.filesystem:
+            fstype: ext4
+            dev: /dev/research/data
+      when: ansible_lvm.vgs.research is defined
+
+    - ansible.builtin.debug:
+        msg: "Volume group does not exist"
+      when: ansible_lvm.vgs.research is not defined`}],
+r:`cd /home/student/ansible
+ansible-navigator run playbooks/lv.yml -m stdout
+# rescued=1 on node3 = 800 MiB fallback (correct)
+# skipped on node1 = no VG (correct)`,
+v:["ansible all -m shell -a 'lvs'  # node3=800m nodes2/4/5=1.47g node1=empty","ansible all -m shell -a 'blkid /dev/research/data'  # TYPE=ext4 on 2,3,4,5"],
+tr:["when: on the block not on individual tasks","Do NOT mount the LV — explicitly forbidden","rescued=1 in PLAY RECAP is expected — not a failure","community.general FQCN required"]},
+{n:"10",t:"Generate a hosts file",d:"med",f:["templates/hosts.j2","playbooks/hosts.yml (DO NOT MODIFY)"],
+q:`Download <code>hosts.j2</code> from classroom and complete it so <code>/etc/myhosts</code> on <b>dev</b> hosts has one line per inventory host. Download <code>hosts.yml</code> from classroom. <b>Do NOT modify hosts.yml.</b>`,
+a:"Download both files. Edit only the template. Jinja2 for loop over <code>groups.all</code> pulling IP and FQDN from <code>hostvars</code> using the <code>ansible_facts</code> namespace.",
+s:[{l:"templates/hosts.j2",c:`127.0.0.1 localhost localhost.localdomain localhost4 localhost4.localdomain4
+::1 localhost localhost.localdomain localhost6 localhost6.localdomain6
+{% for host in groups.all %}
+{{ hostvars[host].ansible_facts.default_ipv4.address }} {{ hostvars[host].ansible_facts.fqdn }} {{ host }}
+{% endfor %}`}],
+r:`wget -O templates/hosts.j2 http://classroom/materials/hosts.j2
+wget -O playbooks/hosts.yml http://classroom/materials/hosts.yml
+# Edit templates/hosts.j2 only, then:
+ansible-navigator run playbooks/hosts.yml -m stdout`,
+v:["ansible dev -m shell -a 'cat /etc/myhosts'  # all 5 nodes listed"],
+tr:["hostvars[host].ansible_facts.fqdn not hostvars[host].ansible_fqdn","Loop over groups.all — must include ALL inventory hosts","Do NOT modify hosts.yml"]},
+{n:"11",t:"Modify file content",d:"easy",f:["playbooks/issue.yml"],
+q:`Create <code>playbooks/issue.yml</code> running on <b>all</b> hosts. Replace <code>/etc/issue</code>:<ul><li>dev → <code>Development</code></li><li>test → <code>Test</code></li><li>prod → <code>Production</code></li></ul>`,
+a:"One play targeting all. Three copy tasks each guarded by <code>when: inventory_hostname in groups.X</code>. The <code>content:</code> key replaces the entire file.",
+s:[{l:"issue.yml",c:`---
+- hosts: all
+  tasks:
+    - ansible.builtin.copy:
+        content: "Development"
+        dest: /etc/issue
+      when: inventory_hostname in groups.dev
+    - ansible.builtin.copy:
+        content: "Test"
+        dest: /etc/issue
+      when: inventory_hostname in groups.test
+    - ansible.builtin.copy:
+        content: "Production"
+        dest: /etc/issue
+      when: inventory_hostname in groups.prod`}],
+r:`ansible-navigator run playbooks/issue.yml -m stdout`,
+v:["ansible dev -a 'cat /etc/issue'  # Development","ansible test -a 'cat /etc/issue'  # Test","ansible prod -a 'cat /etc/issue'  # Production"],
+tr:["node5 (balancers) gets all tasks skipped — correct","Use in operator not == — comparing string to a list","content: replaces the entire file"]},
+{n:"12",t:"Create a web content directory",d:"med",f:["playbooks/webcontent.yml"],
+q:`Create <code>playbooks/webcontent.yml</code> on <b>dev</b> hosts:<ul><li>Create <code>/webdev</code>: group=webdev, mode rwxrwxr-x + <b>setgid</b></li><li>Symlink <code>/var/www/html/webdev</code> → <code>/webdev</code></li><li>Create <code>/webdev/index.html</code>: content <code>Development</code></li><li>Browsing <code>http://172.25.250.9/webdev/</code> returns Development</li></ul>`,
+a:"Three tasks: file (directory mode '2775'), file (symlink), copy (index.html with <code>setype: httpd_sys_content_t</code>). The SELinux type is required with enforcing from Q04.",
+s:[{l:"webcontent.yml",c:`---
+- hosts: dev
+  tasks:
+    - ansible.builtin.file:
+        path: /webdev
+        state: directory
+        group: webdev
+        mode: '2775'
+    - ansible.builtin.file:
+        src: /webdev
+        dest: /var/www/html/webdev
+        state: link
+    - ansible.builtin.copy:
+        content: "Development\n"
+        dest: /webdev/index.html
+        setype: httpd_sys_content_t`}],
+r:`ansible-navigator run playbooks/webcontent.yml -m stdout`,
+v:["ansible dev -a 'ls -ldZ /webdev'  # drwxrwsr-x webdev httpd_sys_content_t","curl http://172.25.250.9/webdev/  # Development"],
+tr:["mode: '2775' must be quoted — unquoted YAML parses it as decimal","setype: httpd_sys_content_t required — SELinux causes 403 without it","Symlink: src=/webdev (target) dest=/var/www/html/webdev (link)"]},
+{n:"13",t:"Generate a hardware report",d:"med",f:["playbooks/hwreport.yml"],
+q:`Create <code>playbooks/hwreport.yml</code> producing <code>/root/hwreport.txt</code> on <b>all</b> nodes:<ul><li>HOST, MEMORY (MB), BIOS version, DISK_SIZE_VDA, DISK_SIZE_VDB</li><li>Format: <code>KEY=value</code> per line · Missing hardware → <code>NONE</code></li></ul>`,
+a:"get_url downloads the template. Five lineinfile tasks replace each key. Use <code>default('NONE', true)</code> — the second <code>true</code> argument is critical.",
+s:[{l:"hwreport.yml",c:`---
+- hosts: all
+  tasks:
+    - ansible.builtin.get_url:
+        url: http://materials/hwreport.empty
+        dest: /root/hwreport.txt
+        force: yes
+    - ansible.builtin.lineinfile:
+        path: /root/hwreport.txt
+        regexp: '^HOST='
+        line: "HOST={{ inventory_hostname }}"
+    - ansible.builtin.lineinfile:
+        path: /root/hwreport.txt
+        regexp: '^MEMORY='
+        line: "MEMORY={{ ansible_memtotal_mb | default('NONE', true) }}"
+    - ansible.builtin.lineinfile:
+        path: /root/hwreport.txt
+        regexp: '^BIOS='
+        line: "BIOS={{ ansible_bios_version | default('NONE', true) }}"
+    - ansible.builtin.lineinfile:
+        path: /root/hwreport.txt
+        regexp: '^DISK_SIZE_VDA='
+        line: "DISK_SIZE_VDA={{ ansible_devices.vda.size | default('NONE', true) }}"
+    - ansible.builtin.lineinfile:
+        path: /root/hwreport.txt
+        regexp: '^DISK_SIZE_VDB='
+        line: "DISK_SIZE_VDB={{ ansible_devices.vdb.size | default('NONE', true) }}"`}],
+r:`ansible-navigator run playbooks/hwreport.yml -m stdout`,
+v:["ansible all -a 'cat /root/hwreport.txt'  # node1 must show DISK_SIZE_VDB=NONE"],
+tr:["default('NONE', true) — second arg true is critical","force: yes refreshes template every run","regexp: '^KEY=' — the ^ anchor prevents mid-line matches"]},
+{n:"14",t:"Create a password vault",d:"med",f:["locker.yml","secret.txt"],
+q:`Create an Ansible vault:<ul><li>Vault: <code>/home/student/ansible/locker.yml</code></li><li>Variables: <code>pw_developer: Imadev</code> and <code>pw_manager: Imamgr</code></li><li>Vault password: <code>whenyouwishuponastar</code></li><li>Password file: <code>/home/student/ansible/secret.txt</code></li></ul>`,
+a:"Write vault password to secret.txt first. Add vault_password_file to ansible.cfg. Create vault with ansible-vault create.",
+s:[{l:"Commands",c:`echo "whenyouwishuponastar" > /home/student/ansible/secret.txt
+chmod 600 secret.txt
+
+# ansible.cfg [defaults] — if not already set:
+vault_password_file = /home/student/ansible/secret.txt
+
+# Create vault (secret.txt used automatically):
+ansible-vault create /home/student/ansible/locker.yml
+# Enter in editor:
+---
+pw_developer: Imadev
+pw_manager: Imamgr`}],
+r:`cat locker.yml                  # must show $ANSIBLE_VAULT header
+ansible-vault view locker.yml   # secret.txt used automatically`,
+v:["head -1 locker.yml  # $ANSIBLE_VAULT;1.1;AES256","ansible-vault view locker.yml  # pw_developer: Imadev  pw_manager: Imamgr"],
+tr:["vault_password_file must be absolute path","Use ansible-vault create not ansible-vault encrypt","locker.yml must stay encrypted — never decrypt it","Variable names must be exact — consumed by Q15"]},
+{n:"15",t:"Create user accounts",d:"hard",f:["playbooks/users.yml","user_list.yml"],
+q:`Download <code>user_list.yml</code> from classroom. Create <code>playbooks/users.yml</code>:<ul><li><b>Developers</b> → dev+test: group <b>devops</b>, pw from pw_developer, expire from list, SHA512</li><li><b>Managers</b> → prod: group <b>opsmgr</b>, pw from pw_manager, expire from list, SHA512</li></ul>`,
+a:"Two plays, each loading locker.yml and user_list.yml via vars_files. Create group first. Loop over users filtered by item.job. Hash with password_hash('sha512').",
+s:[{l:"users.yml",c:`---
+- hosts: dev,test
+  vars_files:
+    - /home/student/ansible/locker.yml
+    - /home/student/ansible/user_list.yml
+  tasks:
+    - ansible.builtin.group:
+        name: devops
+        state: present
+    - ansible.builtin.user:
+        name: "{{ item.name }}"
+        groups: devops
+        password: "{{ pw_developer | password_hash('sha512') }}"
+        password_expire_max: "{{ item.password_expire_max }}"
+      loop: "{{ users }}"
+      when: item.job == 'developer'
+
+- hosts: prod
+  vars_files:
+    - /home/student/ansible/locker.yml
+    - /home/student/ansible/user_list.yml
+  tasks:
+    - ansible.builtin.group:
+        name: opsmgr
+        state: present
+    - ansible.builtin.user:
+        name: "{{ item.name }}"
+        groups: opsmgr
+        password: "{{ pw_manager | password_hash('sha512') }}"
+        password_expire_max: "{{ item.password_expire_max }}"
+      loop: "{{ users }}"
+      when: item.job == 'manager'`}],
+r:`wget -O user_list.yml http://classroom/materials/user_list.yml
+ansible-navigator run playbooks/users.yml -m stdout`,
+v:["ansible dev,test -m shell -a 'id bob; id fred'  # groups include devops","ansible prod -m shell -a 'id sally'  # groups include opsmgr","ssh bob@node1  # Password: Imadev"],
+tr:["vars_files paths must be absolute","password_expire_max not password_expire","Group task before user task","password_hash('sha512') required"]},
+{n:"16",t:"Rekey an Ansible vault",d:"easy",f:["salaries.yml"],
+q:`Download vault from <code>http://classroom/materials/salaries.yml</code>:<ul><li>Current password: <code>insecure4sure</code></li><li>New password: <code>bbe2de98389b</code></li><li>File must remain encrypted</li></ul>`,
+a:"wget the file. Run ansible-vault rekey --ask-vault-pass. Enter old then new password. Verify file still has the vault header.",
+s:[{l:"Commands",c:`wget -O /home/student/ansible/salaries.yml \\
+  http://classroom/materials/salaries.yml
+
+ansible-vault rekey --ask-vault-pass salaries.yml
+# Vault password:      insecure4sure
+# New Vault password:  bbe2de98389b
+# Confirm:             bbe2de98389b
+# Output: Rekey successful`}],
+r:`ansible-vault view --ask-vault-pass salaries.yml
+# Password: bbe2de98389b`,
+v:["head -1 salaries.yml  # $ANSIBLE_VAULT;1.1;AES256 — still encrypted","ansible-vault view --ask-vault-pass salaries.yml  # readable with new password"],
+tr:["Exact passwords: old=insecure4sure new=bbe2de98389b — PDF has a typo","File MUST remain encrypted","If vault_password_file set in ansible.cfg, it handles the OLD password automatically"]},
+{n:"17",t:"Configure a cron job",d:"easy",f:["playbooks/cron.yml"],
+q:`Create <code>playbooks/cron.yml</code> on <b>dev</b> hosts — cron job for user <b>natasha</b>:<ul><li>Runs every <b>2 minutes</b></li><li>Executes: <code>logger "EX294 in progress"</code></li></ul>`,
+a:"Use ansible.builtin.cron. Set <code>minute: \"*/2\"</code>. Set <code>user: natasha</code>. Give the job a <code>name:</code> for idempotency.",
+s:[{l:"cron.yml",c:`---
+- hosts: dev
+  tasks:
+    - ansible.builtin.cron:
+        name: "EX294 progress logger"
+        minute: "*/2"
+        job: 'logger "EX294 in progress"'
+        user: natasha`}],
+r:`ansible-navigator run playbooks/cron.yml -m stdout`,
+v:["ansible dev -a 'crontab -l -u natasha'  # */2 * * * * logger \"EX294 in progress\""],
+tr:["hosts: dev not hosts: test","minute: \"*/2\" not minute: \"2\" — '2' means once at minute 2 each hour","PDF typo: uses EX200 — correct string is EX294 in progress","user: natasha required"]}
+];
+
+let cur=0,filter='all';
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function setFilter(f,el){
+  filter=f;
+  document.querySelectorAll('.fb').forEach(b=>b.className='fb');
+  el.className='fb a-'+f;
+  renderSidebar();
+  const vis=Q.filter(q=>f==='all'||q.d===f);
+  if(vis.length&&f!=='all'&&Q[cur].d!==f){cur=Q.indexOf(vis[0]);renderMain();}
+}
+function renderSidebar(){
+  document.getElementById('sbList').innerHTML=Q.map((q,i)=>{
+    const h=filter!=='all'&&q.d!==filter;
+    return `<div class="si${i===cur?' active':''}${h?' hidden':''}" onclick="goTo(${i})">
+      <span class="si-num">${q.n}</span><span class="si-title">${q.t}</span><span class="bdg ${q.d}">${q.d}</span></div>`;
+  }).join('');
+}
+function renderMain(){
+  const q=Q[cur];
+  document.getElementById('topFile').textContent='q'+q.n+'.md';
+  const dp=document.getElementById('topDiff');
+  dp.textContent=q.d;dp.className='dp '+q.d;
+  document.getElementById('plbl').textContent=(cur+1)+' / '+Q.length;
+  document.getElementById('pfill').style.width=(((cur+1)/Q.length)*100)+'%';
+  document.getElementById('prevBtn').disabled=cur===0;
+  document.getElementById('nextBtn').disabled=cur===Q.length-1;
+  const files=q.f.map(f=>`<span class="fp">${f}</span>`).join('');
+  let sol='';
+  if(q.s.length===1){sol=`<div class="code">${esc(q.s[0].c)}</div>`;}
+  else{
+    const btns=q.s.map((s,i)=>`<button class="ob${i===0?' on':''}" onclick="swO(this,${i})">${esc(s.l)}</button>`).join('');
+    const pans=q.s.map((s,i)=>`<div class="op${i===0?' on':''}" id="op${i}"><div class="code">${esc(s.c)}</div></div>`).join('');
+    sol=`<div class="opt-tabs">${btns}</div>${pans}`;
+  }
+  document.getElementById('content').innerHTML=`
+    <div class="q-heading">Q${q.n} — ${q.t}</div>
+    <div class="q-files">${files}</div>
+    <div class="tabs">
+      <div class="tab on" onclick="swT(0)">❓ Question</div>
+      <div class="tab" onclick="swT(1)">💡 Approach</div>
+      <div class="tab" onclick="swT(2)">📄 Solution</div>
+      <div class="tab" onclick="swT(3)">▶ Run</div>
+      <div class="tab" onclick="swT(4)">✅ Verify</div>
+      <div class="tab" onclick="swT(5)">⚠ Traps</div>
+    </div>
+    <div class="panel on" id="p0"><div class="attempt">📝 Attempt the question yourself before checking the other tabs.</div><div class="qbox">${q.q}</div></div>
+    <div class="panel" id="p1"><div class="prose">${q.a}</div></div>
+    <div class="panel" id="p2">${sol}</div>
+    <div class="panel" id="p3"><div class="run-box"><div class="run-lbl">▶ Run commands</div><div class="code">${esc(q.r)}</div></div></div>
+    <div class="panel" id="p4"><ul class="vlist">${q.v.map(v=>`<li><code>${esc(v)}</code></li>`).join('')}</ul></div>
+    <div class="panel" id="p5"><ul class="tlist">${q.tr.map(t=>`<li>⚠ ${esc(t)}</li>`).join('')}</ul></div>`;
+}
+function swT(i){document.querySelectorAll('.tab').forEach((t,j)=>t.classList.toggle('on',i===j));document.querySelectorAll('.panel').forEach((p,j)=>p.classList.toggle('on',i===j));}
+function swO(el,i){el.closest('.panel').querySelectorAll('.ob').forEach((b,j)=>b.classList.toggle('on',i===j));el.closest('.panel').querySelectorAll('.op').forEach((p,j)=>p.classList.toggle('on',i===j));}
+function goTo(i){cur=i;renderSidebar();renderMain();}
+function nav(d){if(cur+d>=0&&cur+d<Q.length){cur+=d;renderSidebar();renderMain();}}
+renderSidebar();renderMain();
+</script>
+</body>
+</html>

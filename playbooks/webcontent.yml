@@ -1,0 +1,22 @@
+---
+- name: Create web content directory on dev hosts
+  hosts: dev
+  tasks:
+    - name: Create /webdev directory with correct ownership and permissions
+      ansible.builtin.file:
+        path: /webdev
+        state: directory
+        group: webdev
+        mode: '2775'
+
+    - name: Create symbolic link from /var/www/html/webdev to /webdev
+      ansible.builtin.file:
+        src: /webdev
+        dest: /var/www/html/webdev
+        state: link
+
+    - name: Create /webdev/index.html with correct SELinux context
+      ansible.builtin.copy:
+        content: "Development\n"
+        dest: /webdev/index.html
+        setype: httpd_sys_content_t

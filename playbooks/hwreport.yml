@@ -1,0 +1,39 @@
+---
+- name: Generate hardware report on all managed nodes
+  hosts: all
+  tasks:
+    - name: Download empty hardware report template
+      ansible.builtin.get_url:
+        url: http://materials/hwreport.empty
+        dest: /root/hwreport.txt
+        force: yes
+
+    - name: Set HOST value
+      ansible.builtin.lineinfile:
+        path: /root/hwreport.txt
+        regexp: '^HOST='
+        line: "HOST={{ inventory_hostname }}"
+
+    - name: Set MEMORY value
+      ansible.builtin.lineinfile:
+        path: /root/hwreport.txt
+        regexp: '^MEMORY='
+        line: "MEMORY={{ ansible_memtotal_mb | default('NONE', true) }}"
+
+    - name: Set BIOS version
+      ansible.builtin.lineinfile:
+        path: /root/hwreport.txt
+        regexp: '^BIOS='
+        line: "BIOS={{ ansible_bios_version | default('NONE', true) }}"
+
+    - name: Set DISK_SIZE_VDA
+      ansible.builtin.lineinfile:
+        path: /root/hwreport.txt
+        regexp: '^DISK_SIZE_VDA='
+        line: "DISK_SIZE_VDA={{ ansible_devices.vda.size | default('NONE', true) }}"
+
+    - name: Set DISK_SIZE_VDB
+      ansible.builtin.lineinfile:
+        path: /root/hwreport.txt
+        regexp: '^DISK_SIZE_VDB='
+        line: "DISK_SIZE_VDB={{ ansible_devices.vdb.size | default('NONE', true) }}"

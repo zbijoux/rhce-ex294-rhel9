@@ -1,0 +1,51 @@
+---
+# Q04 — SELinux role
+#
+# TWO OPTIONS — choose one:
+#
+# Option 1: Copy RPM role into your roles directory
+#   sudo dnf -y install rhel-system-roles
+#   cp -r /usr/share/ansible/roles/rhel-system-roles.selinux \
+#         /home/student/ansible/roles/
+#   Then use role name: rhel-system-roles.selinux  (as below)
+#
+# Option 2: Use the collection installed in Q05
+#   Change role name to: redhat.rhel_system_roles.selinux
+#
+# Both options run with:
+#   ansible-navigator run playbooks/selinux.yml -m stdout
+
+- hosts: all
+  become: true
+  become_method: sudo
+  become_user: root
+  vars:
+    selinux_policy: targeted
+    selinux_state: enforcing
+  tasks:
+    - name: Execute SELinux role and catch reboot requirement
+      block:
+        - name: Include selinux role (Option 1 — RPM copy)
+          ansible.builtin.include_role:
+            name: rhel-system-roles.selinux
+            # Option 2 — collection FQCN:
+            # name: redhat.rhel_system_roles.selinux
+      rescue:
+        - name: Fail if error is not reboot-related
+          ansible.builtin.fail:
+            msg: "role failed"
+          when: not selinux_reboot_required
+
+        - name: Reboot managed host
+          ansible.builtin.reboot:
+
+        - name: Wait for managed host to come back
+          ansible.builtin.wait_for_connection:
+            delay: 10
+            timeout: 300
+
+        - name: Re-apply the selinux role after reboot
+          ansible.builtin.include_role:
+            name: rhel-system-roles.selinux
+            # Option 2 — collection FQCN:
+            # name: redhat.rhel_system_roles.selinux
